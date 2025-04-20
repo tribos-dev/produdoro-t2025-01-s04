@@ -60,10 +60,13 @@ public class TarefaApplicationService implements TarefaService {
     @Override
     public void usuarioModificaOrdemTarefa(String usuario, UUID idTarefa, int novaPosicao) {
         log.info("[inicia] TarefaApplicationService - usuarioModificaOrdemTarefa");
-        Tarefa tarefa = detalhaTarefa(usuario, idTarefa);
-        List<Tarefa> tarefas = tarefaRepository.buscaTarefasDoUsuario(tarefa.getIdUsuario()).stream()
+        Tarefa tarefasUsuario = detalhaTarefa(usuario, idTarefa);
+        List<Tarefa> tarefas = tarefaRepository.buscaTarefasDoUsuario(tarefasUsuario.getIdUsuario()).stream()
                 .sorted(Comparator.comparingInt(Tarefa::getPosicaoTarefa)).collect(Collectors.toList());
-        log.info("[inicia] TarefaApplicationService - usuarioModificaOrdemTarefa");
+        tarefaRepository.modificaOrdemDaTarefa(tarefasUsuario, tarefas, novaPosicao);
+        tarefasUsuario.alteraPosicaoTarefa(novaPosicao);
+        tarefaRepository.salva(tarefasUsuario);
+        log.info("[finaliza] TarefaApplicationService - usuarioModificaOrdemTarefa");
 
     }
 }
