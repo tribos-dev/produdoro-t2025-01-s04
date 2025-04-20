@@ -48,7 +48,7 @@ public class TarefaApplicationService implements TarefaService {
     public void usuarioModificaOrdemTarefa(String usuario, UUID idTarefa, int novaPosicao) {
         log.info("[inicia] TarefaApplicationService - usuarioModificaOrdemTarefa");
         Tarefa tarefa = detalhaTarefa(usuario, idTarefa);
-        List<Tarefa> tarefas = tarefaRepository.listaTarefasDoUsuario(tarefa.getIdUsuario()).stream()
+        List<Tarefa> tarefas = tarefaRepository.buscaTarefasDoUsuario(tarefa.getIdUsuario()).stream()
                 .sorted(Comparator.comparingInt(Tarefa::getPosicaoTarefa)).collect(Collectors.toList());
         log.info("[inicia] TarefaApplicationService - usuarioModificaOrdemTarefa");
 
