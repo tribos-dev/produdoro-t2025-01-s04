@@ -45,7 +45,7 @@ public class TarefaInfraRepository implements TarefaRepository {
     @Override
     public List<Tarefa> buscaTarefasDoUsuario(UUID idUsuario) {
         log.info("[inicia] TarefaInfraRepository - buscaTarefasDoUsuario");
-        List<Tarefa> todasAsTarefas = tarefaSpringMongoDBRepository.findAllByIdUsuario(idUsuario);
+        List<Tarefa> todasAsTarefas = tarefaSpringMongoDBRepository.findAllByIdUsuarioOrderByPosicaoTarefaAsc(idUsuario);
         log.info("[finaliza] TarefaInfraRepository - buscaTarefasDoUsuario");
         return todasAsTarefas;
     }
@@ -53,6 +53,9 @@ public class TarefaInfraRepository implements TarefaRepository {
     @Override
     public void modificaOrdemDaTarefa(Tarefa tarefasUsuario, List<Tarefa> tarefas, int novaPosicao) {
         log.info("[inicia] TarefaInfraRepository - modificaOrdemDaTarefa");
+        if (novaPosicao < 0 || novaPosicao >= tarefas.size()) {
+            throw APIException.build(HttpStatus.BAD_REQUEST, "A nova posição da tarefa não é válida!");
+        }
         int menorPosicao = (novaPosicao < 0) ? 0 : Math.min(tarefasUsuario.getPosicaoTarefa(), novaPosicao);
         int maiorPosicao = (novaPosicao >= (tarefas.size())) ? tarefas.size() - 1
                 : Math.max(tarefasUsuario.getPosicaoTarefa(), novaPosicao);

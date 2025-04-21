@@ -29,7 +29,8 @@ public class TarefaApplicationService implements TarefaService {
     @Override
     public TarefaIdResponse criaNovaTarefa(TarefaRequest tarefaRequest) {
         log.info("[inicia] TarefaApplicationService - criaNovaTarefa");
-        Tarefa tarefaCriada = tarefaRepository.salva(new Tarefa(tarefaRequest));
+        int posicaoTarefa = tarefaRepository.buscaTarefasDoUsuario(tarefaRequest.getIdUsuario()).size();
+        Tarefa tarefaCriada = tarefaRepository.salva(new Tarefa(tarefaRequest, posicaoTarefa));
         log.info("[finaliza] TarefaApplicationService - criaNovaTarefa");
         return TarefaIdResponse.builder().idTarefa(tarefaCriada.getIdTarefa()).build();
     }
@@ -60,7 +61,11 @@ public class TarefaApplicationService implements TarefaService {
     @Override
     public void usuarioModificaOrdemTarefa(String usuario, UUID idTarefa, int novaPosicao) {
         log.info("[inicia] TarefaApplicationService - usuarioModificaOrdemTarefa");
-        Tarefa tarefasUsuario = detalhaTarefa(usuario, idTarefa);
+
+        Usuario usuarioPorEmail = usuarioRepository.buscaUsuarioPorEmail(usuario);
+        Tarefa tarefasUsuario = tarefaRepository.buscaTarefaPorId(idTarefa)
+                .orElseThrow(() -> APIException.build(HttpStatus.NOT_FOUND, "ID da tarefa invalido!"));
+        tarefasUsuario.validaUsuarioETarefa(usuarioPorEmail, idTarefa);
         List<Tarefa> tarefas = tarefaRepository.buscaTarefasDoUsuario(tarefasUsuario.getIdUsuario()).stream()
                 .sorted(Comparator.comparingInt(Tarefa::getPosicaoTarefa)).collect(Collectors.toList());
         tarefaRepository.modificaOrdemDaTarefa(tarefasUsuario, tarefas, novaPosicao);
