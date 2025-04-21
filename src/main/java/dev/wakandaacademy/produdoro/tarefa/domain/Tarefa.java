@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import dev.wakandaacademy.produdoro.handler.APIException;
 import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaRequest;
+import dev.wakandaacademy.produdoro.usuario.domain.StatusUsuario;
 import dev.wakandaacademy.produdoro.usuario.domain.Usuario;
 
 import org.springframework.data.annotation.Id;
@@ -58,5 +59,34 @@ public class Tarefa {
 
 	public void concluiTarefa() {
 		this.status = StatusTarefa.CONCLUIDA;
+	}
+
+	public void incrementaPomodoro(Tarefa tarefa, Usuario usuario) {
+		pertenceAoUsuario(usuario);
+		if (!usuario.getStatus().equals(StatusUsuario.FOCO)){
+			ativaTarefa();
+			usuario.mudaStatusParaFoco(usuario.getIdUsuario());
+		} else {
+			//tarefa.incrementaPomodoro();
+			this.contagemPomodoro++;
+			verificaQuantidadePomodoro(tarefa, usuario);
+		}
+	}
+
+	private void verificaQuantidadePomodoro(Tarefa tarefa, Usuario usuario) {
+		int totalPomodoro = tarefa.getContagemPomodoro();
+		if (totalPomodoro % 4 == 0){
+			usuario.mudaStatusParaPausaLonga(usuario.getIdUsuario());
+		}else {
+			usuario.mudaStatusParaPausaCurta(usuario.getIdUsuario());
+		}
+	}
+
+//	private void incrementaPomodoro(){
+//			this.contagemPomodoro++;
+//		}
+
+	private void ativaTarefa() {
+		this.statusAtivacao = StatusAtivacaoTarefa.ATIVA;
 	}
 }
