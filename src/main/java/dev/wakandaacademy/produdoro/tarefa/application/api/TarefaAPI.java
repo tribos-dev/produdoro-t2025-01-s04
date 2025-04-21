@@ -23,4 +23,10 @@ public interface TarefaAPI {
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     void concluiTarefa(@RequestHeader(name = "Authorization", required = true) String token,
                        @PathVariable UUID idTarefa);
+
+    @PostMapping("/incrementaPomodoro/{idTarefa}")
+    @ResponseStatus(code = HttpStatus.NO_CONTENT)
+    void incrementaPomodoro(@RequestHeader(name = "Authorization", required = true) String token,
+                            @PathVariable UUID idTarefa);
+
 }
