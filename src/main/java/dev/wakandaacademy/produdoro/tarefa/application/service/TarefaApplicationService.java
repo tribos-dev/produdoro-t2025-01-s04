@@ -1,6 +1,7 @@
 package dev.wakandaacademy.produdoro.tarefa.application.service;
 
 import dev.wakandaacademy.produdoro.handler.APIException;
+import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaAlteracaoRequest;
 import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaIdResponse;
 import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaListResponse;
 import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaRequest;
@@ -31,6 +32,7 @@ public class TarefaApplicationService implements TarefaService {
         log.info("[finaliza] TarefaApplicationService - criaNovaTarefa");
         return TarefaIdResponse.builder().idTarefa(tarefaCriada.getIdTarefa()).build();
     }
+
     @Override
     public Tarefa detalhaTarefa(String usuario, UUID idTarefa) {
         log.info("[inicia] TarefaApplicationService - detalhaTarefa");
@@ -44,6 +46,14 @@ public class TarefaApplicationService implements TarefaService {
     }
 
     @Override
+    public void editaTarefa(String email, UUID idTarefa, TarefaAlteracaoRequest tarefaAlteracaoRequest) {
+        log.info("[inicia] TarefaApplicationService - editaTarefa");
+        Tarefa tarefa = detalhaTarefa(email, idTarefa);
+        tarefa.editaTarefa(tarefaAlteracaoRequest);
+        tarefaRepository.salva(tarefa);
+        log.info("[final] TarefaApplicationService - editaTarefa");
+    }
+
     public void deletaTodasSuasTarefas(String usuarioEmail, UUID idUsuario) {
         log.info("[inicia] TarefaApplicationService - deletaTodasSuasTarefas");
         Usuario usuarioId = usuarioRepository.buscaUsuarioPorId(idUsuario);

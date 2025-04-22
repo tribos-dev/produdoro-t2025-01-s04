@@ -17,8 +17,14 @@ public interface TarefaAPI {
 
     @GetMapping("/{idTarefa}")
     @ResponseStatus(code = HttpStatus.OK)
-    TarefaDetalhadoResponse detalhaTarefa(@RequestHeader(name = "Authorization",required = true) String token, 
-    		@PathVariable UUID idTarefa);
+    TarefaDetalhadoResponse detalhaTarefa(@RequestHeader(name = "Authorization", required = true) String token,
+                                          @PathVariable UUID idTarefa);
+
+    @PatchMapping("/edita-tarefa/{idTarefa}")
+    @ResponseStatus(code = HttpStatus.NO_CONTENT)
+    void editaTarefa(@RequestHeader(name = "Authorization", required = true) String token,
+                     @RequestBody @Valid TarefaAlteracaoRequest tarefaAlteracaoRequest,
+                     @PathVariable UUID idTarefa);
 
     @DeleteMapping("/limpar-tarefas/{idUsuario}")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
@@ -26,5 +32,5 @@ public interface TarefaAPI {
 
     @GetMapping("/listarTarefas/{idUsuario}")
     @ResponseStatus(code = HttpStatus.OK)
-    List<TarefaListResponse> listarTarefasUsuario(@RequestHeader(name = "Authorization",required = true) String token, @PathVariable UUID idUsuario);
+    List<TarefaListResponse> listarTarefasUsuario(@RequestHeader(name = "Authorization", required = true) String token, @PathVariable UUID idUsuario);
 }
