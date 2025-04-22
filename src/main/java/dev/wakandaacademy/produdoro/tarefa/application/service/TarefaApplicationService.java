@@ -5,6 +5,7 @@ import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaIdResponse;
 import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaListResponse;
 import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaRequest;
 import dev.wakandaacademy.produdoro.tarefa.application.repository.TarefaRepository;
+import dev.wakandaacademy.produdoro.tarefa.domain.StatusAtivacaoTarefa;
 import dev.wakandaacademy.produdoro.tarefa.domain.Tarefa;
 import dev.wakandaacademy.produdoro.usuario.application.repository.UsuarioRepository;
 import dev.wakandaacademy.produdoro.usuario.domain.Usuario;
@@ -53,4 +54,36 @@ public class TarefaApplicationService implements TarefaService {
         log.info("[finaliza] TarefaApplicationService - buscaTodasTarefas");
         return TarefaListResponse.converte(tarefas);
     }
+
+
+    // Implementação ativaTarefa na TarefaApplicationService
+    @Override
+    public void ativaTarefa(String usuario, UUID idTarefa) {
+        log.info("[inicia] TarefaApplicationService - ativaTarefa");
+        Usuario usuarioLogado = usuarioRepository.buscaUsuarioPorEmail(usuario);
+        Tarefa tarefa = tarefaRepository.buscaTarefaPorId(idTarefa)
+                .orElseThrow(() -> APIException.build(HttpStatus.NOT_FOUND, "Id da tarefa inválido."));
+
+        tarefa.pertenceAoUsuario(usuarioLogado);
+
+        if (tarefa.getStatusAtivacao().equals(StatusAtivacaoTarefa.ATIVA)) {
+            throw APIException.build(HttpStatus.CONFLICT, "Tarefa já está ativa!");
+        }
+
+        List<Tarefa> tarefasDoUsuario = tarefaRepository.buscaTarefasDoUsuario(usuarioLogado.getIdUsuario());
+        tarefasDoUsuario.stream()
+                .filter(t -> t.getStatusAtivacao().equals(StatusAtivacaoTarefa.ATIVA))
+                .forEach(t -> {
+                    t.inativar();
+                    tarefaRepository.salva(t);
+                });
+
+        tarefa.ativar();
+        tarefaRepository.salva(tarefa);
+        log.info("[finaliza] TarefaApplicationService - ativaTarefa");
+    }
+
+
+
+
 }

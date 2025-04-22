@@ -30,4 +30,14 @@ public interface TarefaAPI {
     @GetMapping("/listarTarefas/{idUsuario}")
     @ResponseStatus(code = HttpStatus.OK)
     List<TarefaListResponse> listarTarefasUsuario(@RequestHeader(name = "Authorization",required = true) String token, @PathVariable UUID idUsuario);
+
+
+    // Adição ID tarefa
+
+    @PostMapping("/{idTarefa}/ativar")
+    @ResponseStatus(code = HttpStatus.NO_CONTENT)
+    void ativaTarefa(@RequestHeader(name = "Authorization") String token,
+                     @PathVariable UUID idTarefa);
+
+
 }
