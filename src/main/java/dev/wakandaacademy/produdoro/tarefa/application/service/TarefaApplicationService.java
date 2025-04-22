@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -61,17 +60,15 @@ public class TarefaApplicationService implements TarefaService {
     @Override
     public void usuarioModificaOrdemTarefa(String usuario, UUID idTarefa, int novaPosicao) {
         log.info("[inicia] TarefaApplicationService - usuarioModificaOrdemTarefa");
-
         Usuario usuarioPorEmail = usuarioRepository.buscaUsuarioPorEmail(usuario);
-        Tarefa tarefasUsuario = tarefaRepository.buscaTarefaPorId(idTarefa)
+        Tarefa tarefa = tarefaRepository.buscaTarefaPorId(idTarefa)
                 .orElseThrow(() -> APIException.build(HttpStatus.NOT_FOUND, "ID da tarefa invalido!"));
-        tarefasUsuario.validaUsuarioETarefa(usuarioPorEmail, idTarefa);
-        List<Tarefa> tarefas = tarefaRepository.buscaTarefasDoUsuario(tarefasUsuario.getIdUsuario()).stream()
+        tarefa.validaUsuarioETarefa(usuarioPorEmail, idTarefa);
+        List<Tarefa> tarefas = tarefaRepository.buscaTarefasDoUsuario(tarefa.getIdUsuario()).stream()
                 .sorted(Comparator.comparingInt(Tarefa::getPosicaoTarefa)).collect(Collectors.toList());
-        tarefaRepository.modificaOrdemDaTarefa(tarefasUsuario, tarefas, novaPosicao);
-        tarefasUsuario.alteraPosicaoTarefa(novaPosicao);
-        tarefaRepository.salva(tarefasUsuario);
+        tarefaRepository.modificaOrdemDaTarefa(tarefa, tarefas, novaPosicao);
+        tarefa.alteraPosicaoTarefa(novaPosicao);
+        tarefaRepository.salva(tarefa);
         log.info("[finaliza] TarefaApplicationService - usuarioModificaOrdemTarefa");
-
     }
 }
