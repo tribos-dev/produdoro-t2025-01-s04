@@ -1,7 +1,6 @@
 package dev.wakandaacademy.produdoro.usuario.application.service;
 
 import javax.validation.Valid;
-
 import dev.wakandaacademy.produdoro.usuario.application.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
@@ -53,5 +52,14 @@ public class UsuarioApplicationService implements UsuarioService {
 		log.info("[finaliza] UsuarioApplicationService - buscaUsuarioPorId");
 	}
 
+	@Override
+	public void mudaStatusParaFoco(String usuario, UUID idUsuario) {
+		log.info("[inicia] UsuarioApplicationService - mudaStatusParaFoco");
+		Usuario usuarioFoco = usuarioRepository.buscaUsuarioPorEmail(usuario);
+		usuarioRepository.buscaUsuarioPorId(idUsuario);
+		usuarioFoco.mudaStatusParaFoco(idUsuario);
+		usuarioRepository.salva(usuarioFoco);
+		log.info("[finaliza] UsuarioApplicationService - mudaStatusParaFoco");
 
+	}
 }

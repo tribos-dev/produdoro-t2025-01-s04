@@ -21,6 +21,7 @@ import java.util.UUID;
 public class UsuarioController implements UsuarioAPI {
 	private final UsuarioService usuarioApplicationService;
 	private final TokenService tokenService;
+
 	@Override
 	public UsuarioCriadoResponse postNovoUsuario(@Valid UsuarioNovoRequest usuarioNovo) {
 		log.info("[inicia] UsuarioController - postNovoUsuario");
@@ -52,5 +53,13 @@ public class UsuarioController implements UsuarioAPI {
 				.orElseThrow(() -> APIException.build(HttpStatus.UNAUTHORIZED, "credencial de autenticação não é válida"));
 		log.info("[usuario] {}", usuario);
 		return usuario;
+	}
+
+	@Override
+	public void mudaStatusParaFoco(String token, UUID idUsuario) {
+		log.info("[inicia] UsuarioController - mudaStatusParaFoco");
+		String usuario = getUsuarioByToken(token);
+		usuarioApplicationService.mudaStatusParaFoco(usuario, idUsuario);
+		log.info("[finaliza] UsuarioController - mudaStatusParaFoco");
 	}
 }

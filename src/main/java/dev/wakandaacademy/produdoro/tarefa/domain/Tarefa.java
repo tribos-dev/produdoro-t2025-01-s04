@@ -3,6 +3,7 @@ package dev.wakandaacademy.produdoro.tarefa.domain;
 import java.util.UUID;
 
 import dev.wakandaacademy.produdoro.handler.APIException;
+import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaAlteracaoRequest;
 import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaRequest;
 import dev.wakandaacademy.produdoro.usuario.domain.Usuario;
 
@@ -38,8 +39,9 @@ public class Tarefa {
 	private StatusTarefa status;
 	private StatusAtivacaoTarefa statusAtivacao;
 	private int contagemPomodoro;
+	private int posicaoTarefa;
 
-	public Tarefa(TarefaRequest tarefaRequest) {
+	public Tarefa(TarefaRequest tarefaRequest, int posicaoTarefa) {
 		this.idTarefa = UUID.randomUUID();
 		this.idUsuario = tarefaRequest.getIdUsuario();
 		this.descricao = tarefaRequest.getDescricao();
@@ -48,11 +50,32 @@ public class Tarefa {
 		this.status = StatusTarefa.A_FAZER;
 		this.statusAtivacao = StatusAtivacaoTarefa.INATIVA;
 		this.contagemPomodoro = 1;
+		this.posicaoTarefa = posicaoTarefa;
 	}
 
 	public void pertenceAoUsuario(Usuario usuarioPorEmail) {
-		if(!this.idUsuario.equals(usuarioPorEmail.getIdUsuario())) {
-			throw APIException.build(HttpStatus.UNAUTHORIZED, "Usuário não é dono da Tarefa solicitada!");
+		if (!this.idUsuario.equals(usuarioPorEmail.getIdUsuario())) {
+			throw APIException.build(HttpStatus.UNAUTHORIZED, " Usuário(a) não autorizado(a) para a requisição solicitada!");
 		}
 	}
+
+	public void alteraPosicaoTarefa(int posicaoTarefa) {
+		if (posicaoTarefa < 0) {
+			throw APIException.build(HttpStatus.BAD_REQUEST, "A posição da tarefa não pode ser menor que 0.");
+		}
+		this.posicaoTarefa = posicaoTarefa;
+	}
+
+	public void validaUsuarioETarefa(Usuario usuario, UUID idTarefa) {
+		if (!this.idUsuario.equals(usuario.getIdUsuario())) {
+			throw APIException.build(HttpStatus.UNAUTHORIZED, "Usuário(a) não autorizado(a) para a requisição solicitada!");
+		}
+		if (!this.idTarefa.equals(idTarefa)) {
+			throw APIException.build(HttpStatus.NOT_FOUND, "ID da tarefa invalido!");
+		}
+	}
+
+    public void editaTarefa(TarefaAlteracaoRequest tarefaAlteracaoRequest) {
+		this.descricao = tarefaAlteracaoRequest.getDescricao();
+    }
 }
