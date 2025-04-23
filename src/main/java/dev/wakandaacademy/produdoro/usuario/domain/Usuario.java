@@ -44,6 +44,19 @@ public class Usuario {
 		this.configuracao = new ConfiguracaoUsuario(configuracaoPadrao);
 	}
 
+    public void validaIdUsuario(UUID idUsuario) {
+		if (!this.idUsuario.equals(idUsuario)) {
+			throw APIException.build(HttpStatus.UNAUTHORIZED, "Usuario nao autorizado para a requisição solicitada!");
+
+		}
+    }
+
+    public void validaUsuario(UUID idUsuario) {
+		if (!this.idUsuario.equals(idUsuario)) {
+			throw APIException.build(HttpStatus.UNAUTHORIZED, "Credencial de autenticação não é válida.");
+		}
+    }
+
     public void mudaStatusParaFoco(UUID idUsuario) {
 		perteceAoUsuario(idUsuario);
 		verificaStatusFoco();
@@ -69,4 +82,3 @@ public class Usuario {
 
 
 }
-
