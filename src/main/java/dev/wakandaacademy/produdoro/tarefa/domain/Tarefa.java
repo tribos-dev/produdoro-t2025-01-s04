@@ -3,6 +3,7 @@ package dev.wakandaacademy.produdoro.tarefa.domain;
 import java.util.UUID;
 
 import dev.wakandaacademy.produdoro.handler.APIException;
+import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaAlteracaoRequest;
 import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaRequest;
 import dev.wakandaacademy.produdoro.usuario.domain.Usuario;
 
@@ -73,4 +74,8 @@ public class Tarefa {
 			throw APIException.build(HttpStatus.NOT_FOUND, "ID da tarefa invalido!");
 		}
 	}
+
+    public void editaTarefa(TarefaAlteracaoRequest tarefaAlteracaoRequest) {
+		this.descricao = tarefaAlteracaoRequest.getDescricao();
+    }
 }

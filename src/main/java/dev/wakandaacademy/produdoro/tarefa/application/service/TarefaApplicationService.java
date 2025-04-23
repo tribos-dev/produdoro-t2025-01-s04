@@ -1,6 +1,7 @@
 package dev.wakandaacademy.produdoro.tarefa.application.service;
 
 import dev.wakandaacademy.produdoro.handler.APIException;
+import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaAlteracaoRequest;
 import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaIdResponse;
 import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaListResponse;
 import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaRequest;
@@ -44,6 +45,34 @@ public class TarefaApplicationService implements TarefaService {
         tarefa.pertenceAoUsuario(usuarioPorEmail);
         log.info("[finaliza] TarefaApplicationService - detalhaTarefa");
         return tarefa;
+    }
+
+    @Override
+    public void editaTarefa(String email, UUID idTarefa, TarefaAlteracaoRequest tarefaAlteracaoRequest) {
+        log.info("[inicia] TarefaApplicationService - editaTarefa");
+        Tarefa tarefa = detalhaTarefa(email, idTarefa);
+        tarefa.editaTarefa(tarefaAlteracaoRequest);
+        tarefaRepository.salva(tarefa);
+        log.info("[final] TarefaApplicationService - editaTarefa");
+    }
+
+    public void deletaTodasSuasTarefas(String usuarioEmail, UUID idUsuario) {
+        log.info("[inicia] TarefaApplicationService - deletaTodasSuasTarefas");
+        Usuario usuarioId = usuarioRepository.buscaUsuarioPorId(idUsuario);
+        validaUsuario(usuarioEmail, idUsuario);
+        List<Tarefa> tarefas = tarefaRepository.buscaTarefasDoUsuario(usuarioId.getIdUsuario());
+        if (tarefas.isEmpty()) {
+            throw APIException.build(HttpStatus.CONFLICT, "Usuário não possui tarefa(as) cadastrada(as)");
+        }
+        tarefaRepository.deletaTodasSuasTarefas(tarefas);
+        log.info("[finaliza] TarefaApplicationService - deletaTodasSuasTarefas");
+    }
+
+    private void validaUsuario(String usuarioEmail, UUID idUsuario) {
+        log.info("[inicia] TarefaApplicationService - validaUsuario");
+        Usuario usuarioPorEmail = usuarioRepository.buscaUsuarioPorEmail(usuarioEmail);
+        usuarioPorEmail.validaIdUsuario(idUsuario);
+        log.info("[finaliza] TarefaApplicationService - validaUsuario");
     }
 
     @Override
