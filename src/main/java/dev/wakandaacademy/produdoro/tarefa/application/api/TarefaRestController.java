@@ -60,6 +60,14 @@ public class TarefaRestController implements TarefaAPI {
         return tarefas;
     }
 
+    @Override
+    public void deletaTarefasConcluidas(String token, UUID idUsuario) {
+        log.info("[inicia] TarefaRestController - deletaTarefasConcluidas");
+        String usuario = getUsuarioByToken(token);
+        tarefaService.deletaTarefasConcluidas(usuario, idUsuario);
+        log.info("[finaliza] TarefaRestController - deletaTarefasConcluidas");
+    }
+
     private String getUsuarioByToken(String token) {
         log.debug("[token] {}", token);
         String usuario = tokenService.getUsuarioByBearerToken(token)
