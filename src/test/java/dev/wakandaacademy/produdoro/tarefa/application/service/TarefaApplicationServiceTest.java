@@ -93,5 +93,6 @@ class TarefaApplicationServiceTest {
         assertThrows(APIException.class,
                 () -> tarefaApplicationService.editaTarefa(usuario, idTarefaInvalida, tarefaAlteracaoRequest));
         Optional<Tarefa> tarefa = verify(tarefaRepository, times(1)).buscaTarefaPorId(idTarefaInvalida);
+
     }
 }
