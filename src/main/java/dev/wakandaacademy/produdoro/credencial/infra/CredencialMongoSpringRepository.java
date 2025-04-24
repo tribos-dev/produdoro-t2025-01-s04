@@ -1,10 +1,9 @@
 package dev.wakandaacademy.produdoro.credencial.infra;
 
-import java.util.Optional;
-
+import dev.wakandaacademy.produdoro.credencial.domain.Credencial;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import dev.wakandaacademy.produdoro.credencial.domain.Credencial;
+import java.util.Optional;
 
 public interface CredencialMongoSpringRepository extends MongoRepository<Credencial, String> {
 	Optional<Credencial> findByUsuario(String usuario);
