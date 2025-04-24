@@ -1,11 +1,10 @@
 package dev.wakandaacademy.produdoro.usuario.infra;
 
-import java.util.Optional;
-import java.util.UUID;
-
+import dev.wakandaacademy.produdoro.usuario.domain.Usuario;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import dev.wakandaacademy.produdoro.usuario.domain.Usuario;
+import java.util.Optional;
+import java.util.UUID;
 
 public interface UsuarioMongoSpringRepository extends MongoRepository<Usuario, UUID> {
     Optional<Usuario> findByIdUsuario(UUID idUsuario);

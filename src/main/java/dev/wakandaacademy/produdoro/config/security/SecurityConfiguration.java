@@ -1,5 +1,9 @@
 package dev.wakandaacademy.produdoro.config.security;
 
+import dev.wakandaacademy.produdoro.config.security.service.AutenticacaoSecurityService;
+import dev.wakandaacademy.produdoro.config.security.service.TokenService;
+import dev.wakandaacademy.produdoro.credencial.application.service.CredencialService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,11 +17,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import dev.wakandaacademy.produdoro.config.security.service.AutenticacaoSecurityService;
-import dev.wakandaacademy.produdoro.config.security.service.TokenService;
-import dev.wakandaacademy.produdoro.credencial.application.service.CredencialService;
-import lombok.RequiredArgsConstructor;
 
 @EnableWebSecurity
 @Configuration

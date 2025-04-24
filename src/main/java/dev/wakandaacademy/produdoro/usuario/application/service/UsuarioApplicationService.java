@@ -1,17 +1,16 @@
 package dev.wakandaacademy.produdoro.usuario.application.service;
 
-import javax.validation.Valid;
-import dev.wakandaacademy.produdoro.usuario.application.repository.UsuarioRepository;
-import org.springframework.stereotype.Service;
-
 import dev.wakandaacademy.produdoro.credencial.application.service.CredencialService;
 import dev.wakandaacademy.produdoro.pomodoro.application.service.PomodoroService;
 import dev.wakandaacademy.produdoro.usuario.application.api.UsuarioCriadoResponse;
 import dev.wakandaacademy.produdoro.usuario.application.api.UsuarioNovoRequest;
+import dev.wakandaacademy.produdoro.usuario.application.repository.UsuarioRepository;
 import dev.wakandaacademy.produdoro.usuario.domain.Usuario;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.stereotype.Service;
 
+import javax.validation.Valid;
 import java.util.UUID;
 
 @Service
@@ -43,6 +42,15 @@ public class UsuarioApplicationService implements UsuarioService {
 	}
 
 	@Override
+	public void mudaStatusParaPausaCurta(String email, UUID idUsuario) {
+		log.info("[inicia] UsuarioApplicationService - mudaStatusParaPausaCurta");
+		Usuario usuario = usuarioRepository.buscaUsuarioPorEmail(email);
+		usuarioRepository.buscaUsuarioPorId(idUsuario);
+		usuario.mudaStatusParaPausaCurta(idUsuario);
+		usuarioRepository.salva(usuario);
+		log.info("[finaliza] UsuarioApplicationService - mudaStatusParaPausaCurta");
+  }
+  
 	public void mudaStatusParaPausaLonga(String email, UUID idUsuario) {
 		log.info("[inicia] UsuarioApplicationService - buscaUsuarioPorId");
 		Usuario usuario = usuarioRepository.buscaUsuarioPorEmail(email);
@@ -60,6 +68,5 @@ public class UsuarioApplicationService implements UsuarioService {
 		usuarioFoco.mudaStatusParaFoco(idUsuario);
 		usuarioRepository.salva(usuarioFoco);
 		log.info("[finaliza] UsuarioApplicationService - mudaStatusParaFoco");
-
 	}
 }

@@ -1,10 +1,9 @@
 package dev.wakandaacademy.produdoro.usuario.domain;
 
-import java.util.UUID;
-
-import javax.validation.constraints.Email;
-
 import dev.wakandaacademy.produdoro.handler.APIException;
+import dev.wakandaacademy.produdoro.pomodoro.domain.ConfiguracaoPadrao;
+import dev.wakandaacademy.produdoro.usuario.application.api.UsuarioNovoRequest;
+import lombok.*;
 import dev.wakandaacademy.produdoro.handler.APIException;
 import dev.wakandaacademy.produdoro.pomodoro.domain.ConfiguracaoPadrao;
 import dev.wakandaacademy.produdoro.usuario.application.api.UsuarioNovoRequest;
@@ -25,6 +24,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.http.HttpStatus;
+
+import javax.validation.constraints.Email;
+import java.util.UUID;
 
 @Builder
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -85,7 +87,27 @@ public class Usuario {
 		verificaStatusFoco();
 		alteraStatusFoco();
     }
+    public void mudaStatusParaPausaCurta(UUID idUsuario) {
+		pertenceAoUsuario(idUsuario);
+		verificaSeJaEstaEmPausaCurta();
+		mudaStatusPausaCurta();
+    }
 
+	private void mudaStatusPausaCurta() {
+		this.status = StatusUsuario.PAUSA_CURTA;
+	}
+
+	private void pertenceAoUsuario(UUID idUsuario) {
+		if (!this.idUsuario.equals(idUsuario)) {
+			throw APIException.build(HttpStatus.UNAUTHORIZED, "Credencial de autenticação não é válida.");
+		}
+	}
+
+	private void verificaSeJaEstaEmPausaCurta() {
+		if (this.status.equals(StatusUsuario.PAUSA_CURTA)) {
+			throw APIException.build(HttpStatus.BAD_REQUEST, "Usuario já está em PAUSA CURTA");
+    }
+  }
 	private void alteraStatusFoco() {
 		this.status = StatusUsuario.FOCO;
 	}
