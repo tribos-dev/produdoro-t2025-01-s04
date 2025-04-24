@@ -17,6 +17,11 @@ public interface UsuarioAPI {
 	@ResponseStatus(code = HttpStatus.OK)
 	UsuarioCriadoResponse buscaUsuarioPorId(@PathVariable UUID idUsuario);
 
+
+	@PatchMapping("/pausaCurta/{idUsuario}")
+	@ResponseStatus(code = HttpStatus.NO_CONTENT)
+	void mudaStatusPausaCurta(@RequestHeader(name = "Authorization") String token, @PathVariable UUID idUsuario);
+
 	@PatchMapping("/pausaLonga/{idUsuario}")
 	@ResponseStatus(code = HttpStatus.NO_CONTENT)
 	void mudaStatusPausaLonga(@RequestHeader(name = "Authorization", required = true) String token,
@@ -26,6 +31,7 @@ public interface UsuarioAPI {
 	@ResponseStatus(code = HttpStatus.OK)
 	void mudaStatusParaFoco(@RequestHeader(name = "Authorization",required = true) String token,
 							@PathVariable UUID idUsuario);
+
 }
 
 

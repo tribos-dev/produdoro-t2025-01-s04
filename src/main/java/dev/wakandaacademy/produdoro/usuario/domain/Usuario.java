@@ -71,7 +71,27 @@ public class Usuario {
 		verificaStatusFoco();
 		alteraStatusFoco();
     }
+    public void mudaStatusParaPausaCurta(UUID idUsuario) {
+		pertenceAoUsuario(idUsuario);
+		verificaSeJaEstaEmPausaCurta();
+		mudaStatusPausaCurta();
+    }
 
+	private void mudaStatusPausaCurta() {
+		this.status = StatusUsuario.PAUSA_CURTA;
+	}
+
+	private void pertenceAoUsuario(UUID idUsuario) {
+		if (!this.idUsuario.equals(idUsuario)) {
+			throw APIException.build(HttpStatus.UNAUTHORIZED, "Credencial de autenticação não é válida.");
+		}
+	}
+
+	private void verificaSeJaEstaEmPausaCurta() {
+		if (this.status.equals(StatusUsuario.PAUSA_CURTA)) {
+			throw APIException.build(HttpStatus.BAD_REQUEST, "Usuario já está em PAUSA CURTA");
+    }
+  }
 	private void alteraStatusFoco() {
 		this.status = StatusUsuario.FOCO;
 	}

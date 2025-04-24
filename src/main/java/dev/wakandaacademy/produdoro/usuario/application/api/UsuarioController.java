@@ -17,7 +17,7 @@ import java.util.UUID;
 @Log4j2
 @RequiredArgsConstructor
 public class UsuarioController implements UsuarioAPI {
-	private final UsuarioService usuarioApplicationService;
+	private final UsuarioService usuarioAppplicationService;
 	private final TokenService tokenService;
 
 	@Override
@@ -37,6 +37,18 @@ public class UsuarioController implements UsuarioAPI {
 	}
 
 	@Override
+	public void mudaStatusPausaCurta(String token, UUID idUsuario) {
+		log.info("[inicia] UsuarioController - mudaStatusPausaCurta");
+		String email = getUsuarioByToken(token);
+		usuarioAppplicationService.mudaStatusParaPausaCurta(email, idUsuario);
+		log.info("[finaliza] UsuarioController - mudaStatusPausaCurta");
+	}
+
+	private String getUsuarioByToken(String token) {
+		String usuario = tokenService.getUsuarioByBearerToken(token)
+				.orElseThrow(() -> APIException.build(HttpStatus.UNAUTHORIZED, token));
+		return usuario;
+	}
 	public void mudaStatusPausaLonga(String token, UUID idUsuario) {
 		log.info("[inicia] UsuarioController - mudaStatusPausaLonga");
 		log.info("[idUsuario] {}", idUsuario);
