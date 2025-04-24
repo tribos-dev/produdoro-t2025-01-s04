@@ -79,15 +79,16 @@ public class Tarefa {
 
 	public void incrementaPomodoro(Tarefa tarefa, Usuario usuario) {
 		pertenceAoUsuario(usuario);
-        ativaTarefa();
         verificaSeUsuarioEstaEmFoco(usuario);
+        ativaTarefa();
         this.contagemPomodoro++;
-			verificaQuantidadePomodoro(tarefa, usuario);
-		}
+		verificaQuantidadePomodoro(tarefa, usuario);
+	}
 
     private void verificaSeUsuarioEstaEmFoco(Usuario usuario) {
         if (!usuario.getStatus().equals(StatusUsuario.FOCO)){
-            throw APIException.build(HttpStatus.CONFLICT, "O usário não está em FOCO!");}
+            throw APIException.build(HttpStatus.CONFLICT, "O usário não está em FOCO!");
+		}
     }
 
 
