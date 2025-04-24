@@ -78,14 +78,6 @@ class UsuarioApplicationServiceTest {
         verify(usuarioRepository, times(1)).salva(any());
 
     }
-}
-
-    @InjectMocks
-    UsuarioApplicationService usuarioApplicationService;
-
-    @Mock
-    UsuarioRepository usuarioRepository;
-
 
     @Test
     void deveMudarStatusParaPausaCurta() {
@@ -98,5 +90,4 @@ class UsuarioApplicationServiceTest {
         verify(usuarioRepository, times(1)).buscaUsuarioPorId(usuario.getIdUsuario());
         verify(usuarioRepository, times(1)).salva(usuario);
     }
-}
 }
