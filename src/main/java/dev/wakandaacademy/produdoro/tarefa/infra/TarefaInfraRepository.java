@@ -12,6 +12,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Repository
 @Log4j2
@@ -50,8 +52,59 @@ public class TarefaInfraRepository implements TarefaRepository {
     @Override
     public List<Tarefa> buscaTarefasDoUsuario(UUID idUsuario) {
         log.info("[inicia] TarefaInfraRepository - buscaTarefasDoUsuario");
-        List<Tarefa> todasAsTarefas = tarefaSpringMongoDBRepository.findAllByIdUsuario(idUsuario);
+        List<Tarefa> todasAsTarefas = tarefaSpringMongoDBRepository.findAllByIdUsuarioOrderByPosicaoTarefaAsc(idUsuario);
         log.info("[finaliza] TarefaInfraRepository - buscaTarefasDoUsuario");
         return todasAsTarefas;
+    }
+
+    @Override
+    public void modificaOrdemDaTarefa(Tarefa tarefasUsuario, List<Tarefa> tarefas, int novaPosicao) {
+        log.info("[inicia] TarefaInfraRepository - modificaOrdemDaTarefa");
+        if (novaPosicao < 0 || novaPosicao >= tarefas.size()) {
+            throw APIException.build(HttpStatus.BAD_REQUEST, "A nova posição da tarefa não é válida!");
+        }
+        int menorPosicao = (novaPosicao < 0) ? 0 : Math.min(tarefasUsuario.getPosicaoTarefa(), novaPosicao);
+        int maiorPosicao = (novaPosicao >= (tarefas.size())) ? tarefas.size() - 1
+                : Math.max(tarefasUsuario.getPosicaoTarefa(), novaPosicao);
+        validaPosicao(tarefas.size(), tarefasUsuario.getPosicaoTarefa(), novaPosicao);
+        novaPosicao = Math.max(0, Math.min(novaPosicao, tarefas.size() - 1));
+        salvaTarefas(tarefas, tarefasUsuario.getPosicaoTarefa(), novaPosicao, menorPosicao, maiorPosicao);
+        log.info("[finaliza] TarefaInfraRepository - modificaOrdemDaTarefa");
+
+    }
+
+    private void salvaTarefas(List<Tarefa> tarefas, int origem, int destino, int menorPosicao,
+            int maiorPosicao) {
+        log.info("[inicia] TarefaInfraRepository - salvaTarefas");
+        List<Tarefa> tarefasAtualizadas = IntStream.range(menorPosicao, maiorPosicao)
+                .mapToObj(posicaoTarefa -> (Tarefa) novaPosicaoTarefa(tarefas, origem, destino, posicaoTarefa))
+                .collect(Collectors.toList());
+        log.info("[finaliza] TarefaInfraRepository - salvaTarefas");
+        tarefaSpringMongoDBRepository.saveAll(tarefasAtualizadas);
+
+    }
+
+    private Object novaPosicaoTarefa(List<Tarefa> tarefas, int origem, int destino, int posicaoTarefa) {
+        log.info("[inicia] TarefaInfraRepository - novaPosicaoTarefa");
+        Tarefa tarefa = destino < origem ? atualizaTarefa(tarefas.get(posicaoTarefa), posicaoTarefa + 1)
+                : atualizaTarefa(tarefas.get(posicaoTarefa + 1), posicaoTarefa);
+        log.info("[finaliza] TarefaInfraRepository - novaPosicaoTarefa");
+        return tarefa;
+    }
+
+    private Tarefa atualizaTarefa(Tarefa tarefa, int novaPosicao) {
+        log.info("[inicia] TarefaInfraRepository - atualizaTarefa");
+        tarefa.alteraPosicaoTarefa(novaPosicao);
+        log.info("[finaliza] TarefaInfraRepository - atualizaTarefa");
+        return tarefa;
+    }
+
+    private void validaPosicao(int tamanhoLista, int posicaoDeOrigem, int novaPosicao) {
+        log.info("[inicia] TarefaInfraRepository - validaPosicao");
+        Optional.of(posicaoDeOrigem)
+                .filter(posicaoTarefa -> posicaoTarefa >= 0 && posicaoTarefa < tamanhoLista)
+                .orElseThrow(() -> APIException.build(HttpStatus.BAD_REQUEST, "A Posição não é válida!"));
+        log.info("[finaliza] TarefaInfraRepository - validaPosicao");
+
     }
 }

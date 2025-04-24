@@ -42,7 +42,7 @@ class TarefaApplicationServiceTest {
     @Test
     void deveRetornarIdTarefaNovaCriada() {
         TarefaRequest request = getTarefaRequest();
-        when(tarefaRepository.salva(any())).thenReturn(new Tarefa(request));
+        when(tarefaRepository.salva(any())).thenReturn(new Tarefa(request, 0));
 
         TarefaIdResponse response = tarefaApplicationService.criaNovaTarefa(request);
 
@@ -63,8 +63,6 @@ class TarefaApplicationServiceTest {
         tarefaApplicationService.deletaTodasSuasTarefas(emailUsuario, idUsuario);
         verify(tarefaRepository, times(1)).deletaTodasSuasTarefas(tarefas);
     }
-
-
 
     public TarefaRequest getTarefaRequest() {
         TarefaRequest request = new TarefaRequest("tarefa 1", UUID.randomUUID(), null, null, 0);
@@ -94,5 +92,64 @@ class TarefaApplicationServiceTest {
                 () -> tarefaApplicationService.editaTarefa(usuario, idTarefaInvalida, tarefaAlteracaoRequest));
         Optional<Tarefa> tarefa = verify(tarefaRepository, times(1)).buscaTarefaPorId(idTarefaInvalida);
 
+    }
+
+    @Test
+    void deveModificarOrdemDaTarefaComSucesso() {
+        // Cenário positivo
+        Usuario usuario = DataHelper.createUsuario();
+        Tarefa tarefa = DataHelper.createTarefa();
+        List<Tarefa> tarefas = DataHelper.createListTarefa();
+        int novaPosicao = 2;
+
+        when(usuarioRepository.buscaUsuarioPorEmail(any())).thenReturn(usuario);
+        when(tarefaRepository.buscaTarefaPorId(any())).thenReturn(Optional.of(tarefa));
+        when(tarefaRepository.buscaTarefasDoUsuario(any())).thenReturn(tarefas);
+
+        assertDoesNotThrow(() -> tarefaApplicationService.usuarioModificaOrdemTarefa(usuario.getEmail(), tarefa.getIdTarefa(), novaPosicao));
+
+        verify(usuarioRepository, times(1)).buscaUsuarioPorEmail(usuario.getEmail());
+        verify(tarefaRepository, times(1)).buscaTarefaPorId(tarefa.getIdTarefa());
+        verify(tarefaRepository, times(1)).buscaTarefasDoUsuario(tarefa.getIdUsuario());
+        verify(tarefaRepository, times(1)).modificaOrdemDaTarefa(tarefa, tarefas, novaPosicao);
+        verify(tarefaRepository, times(1)).salva(tarefa);
+    }
+
+    @Test
+    void naoDeveModificarOrdemQuandoUsuarioNaoAutorizado() {
+        // Cenário negativo: Usuário não autorizado
+        Usuario usuario = DataHelper.createUsuario();
+        Tarefa tarefa = Tarefa.builder().idUsuario(UUID.randomUUID()).build(); // Tarefa com outro usuário
+        int novaPosicao = 2;
+
+        when(usuarioRepository.buscaUsuarioPorEmail(any())).thenReturn(usuario);
+        when(tarefaRepository.buscaTarefaPorId(any())).thenReturn(Optional.of(tarefa));
+
+        APIException exception = assertThrows(APIException.class,
+                () -> tarefaApplicationService.usuarioModificaOrdemTarefa(usuario.getEmail(), tarefa.getIdTarefa(), novaPosicao));
+
+        assertEquals("Usuário(a) não autorizado(a) para a requisição solicitada!", exception.getBodyException().getMessage());
+        verify(usuarioRepository, times(1)).buscaUsuarioPorEmail(usuario.getEmail());
+        verify(tarefaRepository, times(1)).buscaTarefaPorId(tarefa.getIdTarefa());
+        verify(tarefaRepository, never()).modificaOrdemDaTarefa(any(), any(), anyInt());
+    }
+
+    @Test
+    void naoDeveModificarOrdemQuandoTarefaNaoEncontrada() {
+        // Cenário negativo: Tarefa não encontrada
+        Usuario usuario = DataHelper.createUsuario();
+        UUID idTarefaInvalida = UUID.randomUUID();
+        int novaPosicao = 2;
+
+        when(usuarioRepository.buscaUsuarioPorEmail(any())).thenReturn(usuario);
+        when(tarefaRepository.buscaTarefaPorId(idTarefaInvalida)).thenReturn(Optional.empty());
+
+        APIException exception = assertThrows(APIException.class,
+                () -> tarefaApplicationService.usuarioModificaOrdemTarefa(usuario.getEmail(), idTarefaInvalida, novaPosicao));
+
+        assertEquals("ID da tarefa invalido!", exception.getBodyException().getMessage());
+        verify(usuarioRepository, times(1)).buscaUsuarioPorEmail(usuario.getEmail());
+        verify(tarefaRepository, times(1)).buscaTarefaPorId(idTarefaInvalida);
+        verify(tarefaRepository, never()).modificaOrdemDaTarefa(any(), any(), anyInt());
     }
 }

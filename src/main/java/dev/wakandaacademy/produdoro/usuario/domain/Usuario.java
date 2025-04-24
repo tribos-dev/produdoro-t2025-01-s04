@@ -44,6 +44,28 @@ public class Usuario {
 		this.configuracao = new ConfiguracaoUsuario(configuracaoPadrao);
 	}
 
+    public void mudaStatusParaPausaLonga(UUID idUsuario) {
+		validaUsuario(idUsuario);
+		validaStatusPausaLonga();
+		mudaStatusPausaLonga();
+    }
+
+	private void mudaStatusPausaLonga() {
+		this.status = StatusUsuario.PAUSA_LONGA;
+	}
+
+	private void validaStatusPausaLonga() {
+		if (this.status.equals(StatusUsuario.PAUSA_LONGA)) {
+			throw APIException.build(HttpStatus.CONFLICT, "Usuário já está em pausa longa");
+		}
+	}
+
+	public void validaUsuario(UUID idUsuario) {
+		if (!this.idUsuario.equals(idUsuario)) {
+			throw APIException.build(HttpStatus.UNAUTHORIZED, "Usuário(a) não autorizado(a) para a requisição solicitada");
+		}
+	}
+
     public void validaIdUsuario(UUID idUsuario) {
 		if (!this.idUsuario.equals(idUsuario)) {
 			throw APIException.build(HttpStatus.UNAUTHORIZED, "Usuario nao autorizado para a requisição solicitada!");
@@ -51,12 +73,11 @@ public class Usuario {
 		}
     }
 
-    public void validaUsuario(UUID idUsuario) {
-		if (!this.idUsuario.equals(idUsuario)) {
-			throw APIException.build(HttpStatus.UNAUTHORIZED, "Credencial de autenticação não é válida.");
-		}
+    public void mudaStatusParaFoco(UUID idUsuario) {
+		perteceAoUsuario(idUsuario);
+		verificaStatusFoco();
+		alteraStatusFoco();
     }
-
     public void mudaStatusParaPausaCurta(UUID idUsuario) {
 		pertenceAoUsuario(idUsuario);
 		verificaSeJaEstaEmPausaCurta();
@@ -76,6 +97,22 @@ public class Usuario {
 	private void verificaSeJaEstaEmPausaCurta() {
 		if (this.status.equals(StatusUsuario.PAUSA_CURTA)) {
 			throw APIException.build(HttpStatus.BAD_REQUEST, "Usuario já está em PAUSA CURTA");
+    }
+  }
+	private void alteraStatusFoco() {
+		this.status = StatusUsuario.FOCO;
+	}
+
+	private void verificaStatusFoco() {
+		if (this.status.equals(StatusUsuario.FOCO)) {
+			throw APIException.build(HttpStatus.CONFLICT, "O usuário já está em foco.");
+		}
+
+	}
+
+	private void perteceAoUsuario(UUID usuarioFoco) {
+		if (!this.idUsuario.equals(usuarioFoco)) {
+			throw APIException.build(HttpStatus.UNAUTHORIZED, " credencial de autenticação não é válida. ");
 		}
 	}
 }
