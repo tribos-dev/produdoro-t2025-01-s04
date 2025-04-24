@@ -1,9 +1,9 @@
 package dev.wakandaacademy.produdoro.usuario.application.api;
 
+import lombok.Value;
+
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Size;
-
-import lombok.Value;
 
 @Value
 public class UsuarioNovoRequest {

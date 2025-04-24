@@ -1,14 +1,13 @@
 package dev.wakandaacademy.produdoro.credencial.application.service;
 
-import javax.validation.Valid;
-
-import org.springframework.stereotype.Service;
-
 import dev.wakandaacademy.produdoro.credencial.application.repository.CredencialRepository;
 import dev.wakandaacademy.produdoro.credencial.domain.Credencial;
 import dev.wakandaacademy.produdoro.usuario.application.api.UsuarioNovoRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import javax.validation.Valid;
 
 @Service
 @RequiredArgsConstructor
