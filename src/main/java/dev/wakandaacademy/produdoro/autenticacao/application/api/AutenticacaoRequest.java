@@ -1,14 +1,13 @@
 package dev.wakandaacademy.produdoro.autenticacao.application.api;
 
+import lombok.Builder;
+import lombok.Data;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-
-import lombok.Builder;
-import lombok.Data;
 
 @Data
 @Builder

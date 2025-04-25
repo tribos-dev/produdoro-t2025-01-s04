@@ -1,10 +1,5 @@
 package dev.wakandaacademy.produdoro.autenticacao.application.service;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.stereotype.Service;
-
 import dev.wakandaacademy.produdoro.autenticacao.domain.Token;
 import dev.wakandaacademy.produdoro.config.security.service.TokenService;
 import dev.wakandaacademy.produdoro.credencial.application.service.CredencialService;
@@ -12,6 +7,10 @@ import dev.wakandaacademy.produdoro.credencial.domain.Credencial;
 import dev.wakandaacademy.produdoro.handler.APIException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.stereotype.Service;
 
 @Service
 @Log4j2

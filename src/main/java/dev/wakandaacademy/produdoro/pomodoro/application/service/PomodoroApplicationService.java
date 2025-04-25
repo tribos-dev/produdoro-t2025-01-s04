@@ -1,8 +1,7 @@
 package dev.wakandaacademy.produdoro.pomodoro.application.service;
 
-import org.springframework.stereotype.Service;
-
 import dev.wakandaacademy.produdoro.pomodoro.domain.ConfiguracaoPadrao;
+import org.springframework.stereotype.Service;
 
 @Service
 public class PomodoroApplicationService implements PomodoroService {
