@@ -1,17 +1,16 @@
 package dev.wakandaacademy.produdoro.config.security.service;
 
-import java.util.Optional;
-
+import dev.wakandaacademy.produdoro.credencial.application.repository.CredencialRepository;
+import dev.wakandaacademy.produdoro.handler.APIException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import dev.wakandaacademy.produdoro.credencial.application.repository.CredencialRepository;
-import dev.wakandaacademy.produdoro.handler.APIException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

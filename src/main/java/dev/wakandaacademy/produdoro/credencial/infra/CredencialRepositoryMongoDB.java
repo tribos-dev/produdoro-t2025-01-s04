@@ -1,13 +1,12 @@
 package dev.wakandaacademy.produdoro.credencial.infra;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Repository;
-
 import dev.wakandaacademy.produdoro.credencial.application.repository.CredencialRepository;
 import dev.wakandaacademy.produdoro.credencial.domain.Credencial;
 import dev.wakandaacademy.produdoro.handler.APIException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor

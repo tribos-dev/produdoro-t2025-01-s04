@@ -10,6 +10,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 import dev.wakandaacademy.produdoro.DataHelper;
+import dev.wakandaacademy.produdoro.handler.APIException;
+import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaAlteracaoRequest;
+import dev.wakandaacademy.produdoro.usuario.application.repository.UsuarioRepository;
+import dev.wakandaacademy.produdoro.usuario.domain.Usuario;
+import dev.wakandaacademy.produdoro.DataHelper;
 import dev.wakandaacademy.produdoro.autenticacao.domain.Token;
 import dev.wakandaacademy.produdoro.config.security.service.TokenService;
 import dev.wakandaacademy.produdoro.handler.APIException;
@@ -42,7 +47,6 @@ class TarefaApplicationServiceTest {
     @Mock
     TarefaRepository tarefaRepository;
 
-    //	@MockBean
     @Mock
     UsuarioRepository usuarioRepository;
 
@@ -52,7 +56,7 @@ class TarefaApplicationServiceTest {
     @Test
     void deveRetornarIdTarefaNovaCriada() {
         TarefaRequest request = getTarefaRequest();
-        when(tarefaRepository.salva(any())).thenReturn(new Tarefa(request));
+        when(tarefaRepository.salva(any())).thenReturn(new Tarefa(request, 0));
 
         TarefaIdResponse response = tarefaApplicationService.criaNovaTarefa(request);
 
@@ -61,11 +65,106 @@ class TarefaApplicationServiceTest {
         assertEquals(UUID.class, response.getIdTarefa().getClass());
     }
 
-
+    @Test
+    void deveDeletarTodasTarefas() {
+        Usuario usuario = DataHelper.createUsuario();
+        List<Tarefa> tarefas = DataHelper.createListTarefa();
+        String emailUsuario = usuario.getEmail();
+        UUID idUsuario = usuario.getIdUsuario();
+        when(usuarioRepository.buscaUsuarioPorEmail(any())).thenReturn(usuario);
+        when(usuarioRepository.buscaUsuarioPorId(any())).thenReturn(usuario);
+        when(tarefaRepository.buscaTarefasDoUsuario(any())).thenReturn(tarefas);
+        tarefaApplicationService.deletaTodasSuasTarefas(emailUsuario, idUsuario);
+        verify(tarefaRepository, times(1)).deletaTodasSuasTarefas(tarefas);
+    }
 
     public TarefaRequest getTarefaRequest() {
         TarefaRequest request = new TarefaRequest("tarefa 1", UUID.randomUUID(), null, null, 0);
         return request;
+    }
+
+    @Test
+    void deveAlterarTarefa() {
+        Usuario usuario = DataHelper.createUsuario();
+        Tarefa tarefa = DataHelper.createTarefa();
+        TarefaAlteracaoRequest tarefaAlteracaoRequest = DataHelper.createEditaTarefa();
+        when(usuarioRepository.buscaUsuarioPorEmail(any())).thenReturn(usuario);
+        when(tarefaRepository.buscaTarefaPorId(any())).thenReturn(Optional.of(tarefa));
+        tarefaApplicationService.editaTarefa(usuario.getEmail(), tarefa.getIdTarefa(), tarefaAlteracaoRequest);
+        verify(usuarioRepository, times(1)).buscaUsuarioPorEmail(usuario.getEmail());
+        verify(tarefaRepository, times(1)).buscaTarefaPorId(tarefa.getIdTarefa());
+        assertEquals("Tarefa 2", tarefa.getDescricao());
+    }
+
+    @Test
+    void naoDeveAlterarTarefa() {
+        UUID idTarefaInvalida = UUID.randomUUID();
+        String usuario = "joao";
+        TarefaAlteracaoRequest tarefaAlteracaoRequest = DataHelper.createEditaTarefa();
+        when(tarefaRepository.buscaTarefaPorId(idTarefaInvalida)).thenReturn(Optional.empty());
+        assertThrows(APIException.class,
+                () -> tarefaApplicationService.editaTarefa(usuario, idTarefaInvalida, tarefaAlteracaoRequest));
+        Optional<Tarefa> tarefa = verify(tarefaRepository, times(1)).buscaTarefaPorId(idTarefaInvalida);
+
+    }
+
+    @Test
+    void deveModificarOrdemDaTarefaComSucesso() {
+        // Cenário positivo
+        Usuario usuario = DataHelper.createUsuario();
+        Tarefa tarefa = DataHelper.createTarefa();
+        List<Tarefa> tarefas = DataHelper.createListTarefa();
+        int novaPosicao = 2;
+
+        when(usuarioRepository.buscaUsuarioPorEmail(any())).thenReturn(usuario);
+        when(tarefaRepository.buscaTarefaPorId(any())).thenReturn(Optional.of(tarefa));
+        when(tarefaRepository.buscaTarefasDoUsuario(any())).thenReturn(tarefas);
+
+        assertDoesNotThrow(() -> tarefaApplicationService.usuarioModificaOrdemTarefa(usuario.getEmail(), tarefa.getIdTarefa(), novaPosicao));
+
+        verify(usuarioRepository, times(1)).buscaUsuarioPorEmail(usuario.getEmail());
+        verify(tarefaRepository, times(1)).buscaTarefaPorId(tarefa.getIdTarefa());
+        verify(tarefaRepository, times(1)).buscaTarefasDoUsuario(tarefa.getIdUsuario());
+        verify(tarefaRepository, times(1)).modificaOrdemDaTarefa(tarefa, tarefas, novaPosicao);
+        verify(tarefaRepository, times(1)).salva(tarefa);
+    }
+
+    @Test
+    void naoDeveModificarOrdemQuandoUsuarioNaoAutorizado() {
+        // Cenário negativo: Usuário não autorizado
+        Usuario usuario = DataHelper.createUsuario();
+        Tarefa tarefa = Tarefa.builder().idUsuario(UUID.randomUUID()).build(); // Tarefa com outro usuário
+        int novaPosicao = 2;
+
+        when(usuarioRepository.buscaUsuarioPorEmail(any())).thenReturn(usuario);
+        when(tarefaRepository.buscaTarefaPorId(any())).thenReturn(Optional.of(tarefa));
+
+        APIException exception = assertThrows(APIException.class,
+                () -> tarefaApplicationService.usuarioModificaOrdemTarefa(usuario.getEmail(), tarefa.getIdTarefa(), novaPosicao));
+
+        assertEquals("Usuário(a) não autorizado(a) para a requisição solicitada!", exception.getBodyException().getMessage());
+        verify(usuarioRepository, times(1)).buscaUsuarioPorEmail(usuario.getEmail());
+        verify(tarefaRepository, times(1)).buscaTarefaPorId(tarefa.getIdTarefa());
+        verify(tarefaRepository, never()).modificaOrdemDaTarefa(any(), any(), anyInt());
+    }
+
+    @Test
+    void naoDeveModificarOrdemQuandoTarefaNaoEncontrada() {
+        // Cenário negativo: Tarefa não encontrada
+        Usuario usuario = DataHelper.createUsuario();
+        UUID idTarefaInvalida = UUID.randomUUID();
+        int novaPosicao = 2;
+
+        when(usuarioRepository.buscaUsuarioPorEmail(any())).thenReturn(usuario);
+        when(tarefaRepository.buscaTarefaPorId(idTarefaInvalida)).thenReturn(Optional.empty());
+
+        APIException exception = assertThrows(APIException.class,
+                () -> tarefaApplicationService.usuarioModificaOrdemTarefa(usuario.getEmail(), idTarefaInvalida, novaPosicao));
+
+        assertEquals("ID da tarefa invalido!", exception.getBodyException().getMessage());
+        verify(usuarioRepository, times(1)).buscaUsuarioPorEmail(usuario.getEmail());
+        verify(tarefaRepository, times(1)).buscaTarefaPorId(idTarefaInvalida);
+        verify(tarefaRepository, never()).modificaOrdemDaTarefa(any(), any(), anyInt());
     }
 
     @Test
@@ -136,7 +235,7 @@ class TarefaApplicationServiceTest {
                 () -> tarefaApplicationService.ativaTarefa(usuario.getEmail(),tarefa.getIdTarefa()));
 
         assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatusException());
-        assertEquals("Usuário não é dono da Tarefa solicitada!", exception.getMessage());
+        assertEquals(" Usuário(a) não autorizado(a) para a requisição solicitada!", exception.getMessage());
     }
 
 
