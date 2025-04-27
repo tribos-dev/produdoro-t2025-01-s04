@@ -66,9 +66,7 @@ public class TarefaApplicationService implements TarefaService {
 
         tarefa.pertenceAoUsuario(usuarioLogado);
 
-        if (tarefa.getStatusAtivacao().equals(StatusAtivacaoTarefa.ATIVA)) {
-            throw APIException.build(HttpStatus.CONFLICT, "Tarefa já está ativa!");
-        }
+        verifyEstaAtiva(tarefa);
 
         List<Tarefa> tarefasDoUsuario = tarefaRepository.buscaTarefasDoUsuario(usuarioLogado.getIdUsuario());
         tarefasDoUsuario.stream()
@@ -83,7 +81,11 @@ public class TarefaApplicationService implements TarefaService {
         log.info("[finaliza] TarefaApplicationService - ativaTarefa");
     }
 
-
+    private static void verifyEstaAtiva(Tarefa tarefa) {
+        if (tarefa.getStatusAtivacao().equals(StatusAtivacaoTarefa.ATIVA)) {
+            throw APIException.build(HttpStatus.CONFLICT, "Tarefa já está ativa!");
+        }
+    }
 
 
 }
