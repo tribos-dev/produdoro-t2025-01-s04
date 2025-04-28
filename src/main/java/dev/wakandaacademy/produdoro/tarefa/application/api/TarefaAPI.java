@@ -7,6 +7,11 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 
+import javax.validation.Valid;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
 @RestController
 @RequestMapping("/v1/tarefa")
 public interface TarefaAPI {
@@ -49,4 +54,11 @@ public interface TarefaAPI {
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     void deletaTarefasConcluidas(@RequestHeader(name = "Authorization", required = true) String token,
                                 @PathVariable UUID idUsuario);
+
+    @PatchMapping("/{idTarefa}/ativar")
+    @ResponseStatus(code = HttpStatus.NO_CONTENT)
+    void ativaTarefa(@RequestHeader(name = "Authorization") String token,
+                     @PathVariable UUID idTarefa);
+
+
 }

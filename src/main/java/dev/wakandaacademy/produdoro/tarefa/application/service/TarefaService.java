@@ -20,4 +20,6 @@ public interface TarefaService {
     void usuarioModificaOrdemTarefa(String usuario, UUID idTarefa, int novaPosicao);
 
     void deletaTarefasConcluidas(String usuario, UUID idUsuario);
+    void ativaTarefa(String usuario, UUID idTarefa);
+
 }
