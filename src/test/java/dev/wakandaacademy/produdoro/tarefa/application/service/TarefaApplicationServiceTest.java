@@ -254,4 +254,57 @@ class TarefaApplicationServiceTest {
     }
 
 
+
+    @Test
+    void deveIncrementarUmPomodoraATarefa(){
+        //cenario
+        Usuario usuario = DataHelper.createUsuarioFoco();
+        Tarefa tarefa = DataHelper.createTarefa();
+        when(usuarioRepository.buscaUsuarioPorEmail(usuario.getEmail())).thenReturn(usuario);
+        when(tarefaRepository.buscaTarefaPorId(tarefa.getIdTarefa())).thenReturn(Optional.of(tarefa));
+        when(usuarioRepository.salva(usuario)).thenReturn(usuario);
+        when(tarefaRepository.salva(tarefa)).thenReturn(tarefa);
+
+        //acao
+        tarefaApplicationService.incrementaPomodoro(usuario.getEmail(), tarefa.getIdTarefa());
+
+        //verificacao
+        assertEquals(2, tarefa.getContagemPomodoro(), "Deveria incrementar 1 pomodoro");
+
+        verify(usuarioRepository, times(2)).buscaUsuarioPorEmail(usuario.getEmail());
+        verify(tarefaRepository).buscaTarefaPorId(tarefa.getIdTarefa());
+        verify(usuarioRepository).salva(usuario);
+        verify(tarefaRepository).salva(tarefa);
+    }
+
+    @Test
+    void naoDeveIncrementarTarefaNaoEncontrada(){
+        Usuario usuario = DataHelper.createUsuarioFoco();
+        UUID idTarefaInvalida = UUID.randomUUID();
+
+        when(usuarioRepository.buscaUsuarioPorEmail(any())).thenReturn(usuario);
+        when(tarefaRepository.buscaTarefaPorId(idTarefaInvalida)).thenReturn(Optional.empty());
+
+        APIException exception = assertThrows(APIException.class,
+                () -> tarefaApplicationService.incrementaPomodoro(usuario.getEmail(), idTarefaInvalida));
+
+        assertEquals("Tarefa não encontrada!", exception.getBodyException().getMessage());
+        verify(usuarioRepository, times(1)).buscaUsuarioPorEmail(usuario.getEmail());
+        verify(tarefaRepository, times(1)).buscaTarefaPorId(idTarefaInvalida);
+    }
+    @Test
+    void naoDeveIncrementarPomodoroUsuarioNaoAutorizado() {
+        Usuario usuario = DataHelper.createUsuario();
+        Tarefa tarefa = Tarefa.builder().idUsuario(UUID.randomUUID()).build();
+
+        when(usuarioRepository.buscaUsuarioPorEmail(usuario.getEmail())).thenReturn(usuario);
+        when(tarefaRepository.buscaTarefaPorId(tarefa.getIdTarefa())).thenReturn(Optional.of(tarefa));
+
+        APIException exception = assertThrows(APIException.class,
+                () -> tarefaApplicationService.incrementaPomodoro(usuario.getEmail(), tarefa.getIdTarefa()));
+
+        assertEquals(" Usuário(a) não autorizado(a) para a requisição solicitada!", exception.getMessage());
+        verify(usuarioRepository, times(1)).buscaUsuarioPorEmail(usuario.getEmail());
+        verify(tarefaRepository, times(1)).buscaTarefaPorId(tarefa.getIdTarefa());
+    }
 }
