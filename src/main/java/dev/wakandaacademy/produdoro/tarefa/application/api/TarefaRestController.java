@@ -93,4 +93,16 @@
             log.info("[finaliza] TarefaRestController - usuarioModificaOrdemTarefa");
         }
 
-    }
+
+	// Implementação em TarefaRestController ativaTarefa
+
+	@Override
+	public void ativaTarefa(String token, UUID idTarefa) {
+		log.info("[inicia] TarefaRestController - ativaTarefa");
+		String usuario = getUsuarioByToken(token);
+		tarefaService.ativaTarefa(usuario, idTarefa);
+		log.info("[finaliza] TarefaRestController - ativaTarefa");
+	}
+
+
+}

@@ -77,6 +77,18 @@ public class Tarefa {
 		this.status = StatusTarefa.CONCLUIDA;
 	}
 
+
+	// Tarefa com os métodos auxiliares
+
+	public void ativar() {
+		this.statusAtivacao = StatusAtivacaoTarefa.ATIVA;
+	}
+
+	public void inativar() {
+		this.statusAtivacao = StatusAtivacaoTarefa.INATIVA;
+	}
+
+
 	public void incrementaPomodoro(Tarefa tarefa, Usuario usuario) {
 		pertenceAoUsuario(usuario);
         verificaSeUsuarioEstaEmFoco(usuario);

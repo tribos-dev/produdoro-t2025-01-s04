@@ -49,4 +49,11 @@ public interface TarefaAPI {
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     void concluiTarefa(@RequestHeader(name = "Authorization", required = true) String token,
                        @PathVariable UUID idTarefa);
+
+    @PatchMapping("/{idTarefa}/ativar")
+    @ResponseStatus(code = HttpStatus.NO_CONTENT)
+    void ativaTarefa(@RequestHeader(name = "Authorization") String token,
+                     @PathVariable UUID idTarefa);
+
+
 }
