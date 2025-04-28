@@ -75,4 +75,16 @@ public class Tarefa {
 	public void concluiTarefa() {
 		this.status = StatusTarefa.CONCLUIDA;
 	}
+
+
+	// Tarefa com os métodos auxiliares
+
+	public void ativar() {
+		this.statusAtivacao = StatusAtivacaoTarefa.ATIVA;
+	}
+
+	public void inativar() {
+		this.statusAtivacao = StatusAtivacaoTarefa.INATIVA;
+	}
+
 }
