@@ -13,4 +13,6 @@ public interface TarefaRepository {
     void deletaTodasSuasTarefas(List<Tarefa> tarefas);
     List<Tarefa> buscaTarefasDoUsuario(UUID idUsuario);
     void modificaOrdemDaTarefa(Tarefa tarefasUsuario, List<Tarefa> tarefas, int novaPosicao);
+    List<Tarefa> buscaTarefasConcluidas(UUID idUsuario);
+    void deletaTarefasConcluidas(List<Tarefa> tarefasConcluidas);
 }

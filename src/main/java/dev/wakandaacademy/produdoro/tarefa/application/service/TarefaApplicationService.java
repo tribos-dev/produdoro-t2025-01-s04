@@ -156,4 +156,14 @@ public class TarefaApplicationService implements TarefaService {
     }
 
 
+
+    @Override
+    public void deletaTarefasConcluidas(String usuario, UUID idUsuario) {
+        log.info("[inicia] TarefaApplicationService - deletaTarefasConcluidas");
+        Usuario usuarioPorId = usuarioRepository.buscaUsuarioPorId(idUsuario);
+        validaUsuario(usuario, idUsuario);
+        List<Tarefa> tarefasConcluidas = tarefaRepository.buscaTarefasConcluidas(idUsuario);
+        tarefaRepository.deletaTarefasConcluidas(tarefasConcluidas);
+        log.info("[finaliza] TarefaApplicationService - deletaTarefasConcluidas");
+    }
 }

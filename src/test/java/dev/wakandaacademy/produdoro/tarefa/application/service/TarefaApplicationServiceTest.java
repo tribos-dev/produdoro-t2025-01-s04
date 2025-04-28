@@ -4,10 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import dev.wakandaacademy.produdoro.DataHelper;
 import dev.wakandaacademy.produdoro.handler.APIException;
@@ -256,6 +253,31 @@ class TarefaApplicationServiceTest {
 
 
     @Test
+    void deveExcluirTarefasConcluidasComSucesso() {
+        Usuario usuario = DataHelper.createUsuario1();
+        List<Tarefa> tarefasConcluidas = DataHelper.createListTarefa();
+        UUID idUsuario = usuario.getIdUsuario();
+
+        when(usuarioRepository.buscaUsuarioPorEmail(any())).thenReturn(usuario);
+        when(usuarioRepository.buscaUsuarioPorId(any())).thenReturn(usuario);
+        when(tarefaRepository.buscaTarefasConcluidas(idUsuario)).thenReturn(tarefasConcluidas);
+
+        assertDoesNotThrow(() -> tarefaApplicationService.deletaTarefasConcluidas(usuario.getEmail(), idUsuario));
+
+        verify(tarefaRepository, times(1)).deletaTarefasConcluidas(tarefasConcluidas);
+    }
+
+    @Test
+    void deveLancarExcecaoQuandoUsuarioNaoEncontrado() {
+        Usuario usuario = DataHelper.createUsuario();
+        UUID idUsuario = UUID.randomUUID();
+        String usuarioEmail = usuario.getEmail();
+
+        when(usuarioRepository.buscaUsuarioPorEmail(any())).thenReturn(usuario);
+        when(usuarioRepository.buscaUsuarioPorId(any())).thenReturn(usuario);
+
+        assertThrows(APIException.class,() -> tarefaApplicationService.deletaTarefasConcluidas(usuarioEmail, idUsuario));
+    }
     void deveIncrementarUmPomodoraATarefa(){
         //cenario
         Usuario usuario = DataHelper.createUsuarioFoco();

@@ -2,6 +2,7 @@ package dev.wakandaacademy.produdoro.tarefa.infra;
 
 import dev.wakandaacademy.produdoro.handler.APIException;
 import dev.wakandaacademy.produdoro.tarefa.application.repository.TarefaRepository;
+import dev.wakandaacademy.produdoro.tarefa.domain.StatusTarefa;
 import dev.wakandaacademy.produdoro.tarefa.domain.Tarefa;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -70,6 +71,25 @@ public class TarefaInfraRepository implements TarefaRepository {
         novaPosicao = Math.max(0, Math.min(novaPosicao, tarefas.size() - 1));
         salvaTarefas(tarefas, tarefasUsuario.getPosicaoTarefa(), novaPosicao, menorPosicao, maiorPosicao);
         log.info("[finaliza] TarefaInfraRepository - modificaOrdemDaTarefa");
+
+    }
+
+    @Override
+    public List<Tarefa> buscaTarefasConcluidas(UUID idUsuario) {
+        log.info("[inicia] TarefaInfraRepository - buscaTarefasConcluidas");
+        List<Tarefa> tarefasConcluidas = tarefaSpringMongoDBRepository.findAllByIdUsuarioAndStatus(idUsuario, StatusTarefa.CONCLUIDA);
+        log.info("[finaliza] TarefaInfraRepository - buscaTarefasConcluidas");
+        return tarefasConcluidas;
+    }
+
+    @Override
+    public void deletaTarefasConcluidas(List<Tarefa> tarefasConcluidas) {
+        log.info("[inicia] TarefaInfraRepository - deletaTarefasConcluidas");
+        if (tarefasConcluidas.isEmpty()) {
+            throw APIException.build(HttpStatus.NOT_FOUND, "Usuário não possui nenhuma tarefa concluída!");
+        }
+        tarefaSpringMongoDBRepository.deleteAll(tarefasConcluidas);
+        log.info("[finaliza] TarefaInfraRepository - deletaTarefasConcluidas");
 
     }
 

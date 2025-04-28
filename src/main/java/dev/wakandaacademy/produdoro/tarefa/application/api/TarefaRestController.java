@@ -68,13 +68,21 @@
             return tarefas;
         }
 
-        private String getUsuarioByToken(String token) {
-            log.debug("[token] {}", token);
-            String usuario = tokenService.getUsuarioByBearerToken(token)
-                    .orElseThrow(() -> APIException.build(HttpStatus.UNAUTHORIZED, token));
-            log.info("[usuario] {}", usuario);
-            return usuario;
-        }
+    @Override
+    public void deletaTarefasConcluidas(String token, UUID idUsuario) {
+        log.info("[inicia] TarefaRestController - deletaTarefasConcluidas");
+        String usuario = getUsuarioByToken(token);
+        tarefaService.deletaTarefasConcluidas(usuario, idUsuario);
+        log.info("[finaliza] TarefaRestController - deletaTarefasConcluidas");
+    }
+
+    private String getUsuarioByToken(String token) {
+        log.debug("[token] {}", token);
+        String usuario = tokenService.getUsuarioByBearerToken(token)
+                .orElseThrow(() -> APIException.build(HttpStatus.UNAUTHORIZED, token));
+        log.info("[usuario] {}", usuario);
+        return usuario;
+    }
         @Override
         public void incrementaPomodoro(String token, UUID idTarefa) {
             log.info("[inicia] TarefaRestController - incrementaPomodoro");
