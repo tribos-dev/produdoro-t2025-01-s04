@@ -32,6 +32,8 @@ public interface UsuarioAPI {
 	void mudaStatusParaFoco(@RequestHeader(name = "Authorization",required = true) String token,
 							@PathVariable UUID idUsuario);
 
+
+	deleta tarefas concluidas
 }
 
 
